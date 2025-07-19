@@ -20,7 +20,7 @@ export default function RootLayout({
       <head />
       <body>
         <Providers>
-            <main className="container mx-auto max-w-7xl pt-16 px-6 flex-grow">
+            <main className="container mx-auto max-w-7xl px-6 flex-grow">
               {children}
             </main>
         </Providers>
