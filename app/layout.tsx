@@ -1,7 +1,5 @@
 import "@/styles/globals.css";
-import { Metadata, Viewport } from "next";
-import { Link } from "@heroui/link";
-import clsx from "clsx";
+import { Metadata, Viewport } from "next";;
 
 import { Providers } from "./providers";
 
