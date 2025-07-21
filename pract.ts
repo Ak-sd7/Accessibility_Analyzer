@@ -39,7 +39,7 @@ export abstract class BaseAccessibilityRule {
   abstract description: string;
   abstract wcagLevel: 'A' | 'AA' | 'AAA';
   abstract wcagCriterion: string;
-  abstract severity: AccessibilityIssue['severity'];
+  protected severity: AccessibilityIssue['severity'] = 'moderate';
   
   protected enabled: boolean = true;
 
@@ -50,7 +50,7 @@ export abstract class BaseAccessibilityRule {
     }
   }
 
-  abstract async evaluate(page: any): Promise<AccessibilityIssue[]>;
+  abstract evaluate(page: any): Promise<AccessibilityIssue[]>;
 
   protected createIssue(
     element: string,
