@@ -11,14 +11,13 @@ export interface Issue {
   selector: string;
   impact: string;
   recommendation: string;
-  helpUrl?: string;
 }
 
 export abstract class BaseRuleStruct {
   abstract id: string;
   abstract wcagLevel: Issue["wcagLevel"];
   abstract wcagCriterion: string;
-  abstract name: string;
+  abstract rule: string;
   abstract description: string;
   protected severity: Issue["severity"] = "moderate";
 
@@ -28,34 +27,33 @@ export abstract class BaseRuleStruct {
     element: string,
     selector: string,
     impact: string,
-    recommendation: string,
-    helpUrl?: string
+    recommendation: string
   ): Issue {
     return {
       id: this.id,
       severity: this.severity,
       wcagLevel: this.wcagLevel,
       wcagCriterion: this.wcagCriterion,
-      rule: this.name,
+      rule: this.rule,
       description: this.description,
       element,
       selector,
       impact,
       recommendation,
-      helpUrl,
     };
   }
 }
 
-export interface Report { // dashboard
+export interface Report {
+  // dashboard
   url: string;
   timestamp: Date;
   summary: {
-	totalIssues: number;
-	critical: number;
-	serious: number;
-	moderate: number;
-	minor: number;
+    totalIssues: number;
+    critical: number;
+    serious: number;
+    moderate: number;
+    minor: number;
   };
   issues: Issue[];
   score: number; // 0-100
