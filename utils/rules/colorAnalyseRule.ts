@@ -108,6 +108,9 @@ export class ColorAnalyseRule extends BaseRuleStruct {
         }
         return [255, 255, 255];
       };
+
+      const elements = document.querySelectorAll(`"input", "button", ""`)
+
       return issues;
     });
   }
