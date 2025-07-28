@@ -109,7 +109,18 @@ export class ColorAnalyseRule extends BaseRuleStruct {
         return [255, 255, 255];
       };
 
-      const elements = document.querySelectorAll(`"input", "button", ""`)
+      const isLargeText = (element: HTMLElement): boolean => {
+        const style = window.getComputedStyle(element);
+        const fontSize = parseFloat(style.fontSize);
+        const fontWeight = style.fontWeight;
+        const isLargeSize = fontSize >= 24; // 18pt ≈ 24px
+        const isBoldAndMedium = fontSize >= 18.7 && (fontWeight === 'bold' || parseInt(fontWeight) >= 700); // 14pt ≈ 18.7px
+        
+        return isLargeSize || isBoldAndMedium;
+      };
+
+
+      const elements = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, div, a, button, label, td, th, li, blockquote, code, pre, small, strong, em, i, b, u, mark, del, ins')
 
       return issues;
     });
