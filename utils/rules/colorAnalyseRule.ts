@@ -113,15 +113,147 @@ export class ColorAnalyseRule extends BaseRuleStruct {
         const style = window.getComputedStyle(element);
         const fontSize = parseFloat(style.fontSize);
         const fontWeight = style.fontWeight;
-        const isLargeSize = fontSize >= 24; // 18pt ≈ 24px
+        const isLargeSize = fontSize >= 24; // 18pt ~ 24px
         const isBoldAndMedium = fontSize >= 18.7 && (fontWeight === 'bold' || parseInt(fontWeight) >= 700); // 14pt ≈ 18.7px
         
         return isLargeSize || isBoldAndMedium;
       };
 
+      const textElements = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, div, a, button, label, td, th, li, blockquote, code, pre, small, strong, em, i, b, u, mark, del, ins')
+      textElements.forEach((ele:Element, ind: number)=>{
+          const element = ele as HTMLElement;
+          const textValue = element.textContent?.trim();
 
-      const elements = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, div, a, button, label, td, th, li, blockquote, code, pre, small, strong, em, i, b, u, mark, del, ins')
+          if(!textValue || textValue.length===0)
+            return;
 
+          const style = getComputedStyle(element);
+          if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+            return;
+          }
+
+          const selector = `${element.tagName.toLowerCase()}: nth-child(${ind+1})`;
+          const elementColor = style.color;
+          const colorRgb = parseColor(elementColor);
+
+          if(!colorRgb)
+            return;
+
+          const backgroundRgb = getBackgroundColor(element);
+          const textLuminance = getLuminance(colorRgb[0], colorRgb[1], colorRgb[2]);
+          const bgLuminance = getLuminance(backgroundRgb[0], backgroundRgb[1], backgroundRgb[2]);
+          const contrastRatio = getContrastRatio(textLuminance, bgLuminance);
+
+          const isLarge = isLargeText(element);
+          // values according to WCAG
+          const minRatioAA = isLarge ? 3 : 4.5;
+          const minRatioAAA = isLarge ? 4.5 : 7;
+
+          // AA complaince
+          if (contrastRatio < minRatioAA) {
+            issues.push({
+              element: element.outerHTML,
+              selector,
+              impact: `Text contrast ratio is ${contrastRatio.toFixed(2)}:1, below WCAG AA minimum of ${minRatioAA}:1 for ${isLarge ? 'large' : 'normal'} text`,
+              recommendation: `Increase contrast between text (${elementColor}) and background. Consider darker text or lighter background to achieve at least ${minRatioAA}:1 ratio`,
+            });
+          }
+          // AAA compliance
+          else if (contrastRatio < minRatioAAA) {
+            issues.push({
+              element: element.outerHTML,
+              selector,
+              impact: `Text contrast ratio is ${contrastRatio.toFixed(2)}:1, meets WCAG AA but falls short of AAA standard (${minRatioAAA}:1)`,
+              recommendation: `Consider improving contrast for better accessibility. Target ${minRatioAAA}:1 ratio for AAA compliance`,
+            });
+          }
+      });
+
+      const inputElements = document.querySelectorAll('input[placeholder], textarea[placeholder]');
+      inputElements.forEach((ele: Element, ind: number) => {
+        const element = ele as HTMLInputElement;
+        const placeholder = element.placeholder?.trim();
+        
+        if (!placeholder) return;
+        
+        const style = window.getComputedStyle(element, '::placeholder');
+        const placeholderColor = style.color;
+        const selector = `${element.tagName.toLowerCase()}[placeholder]:nth-child(${ind + 1})`;
+        
+        const textRgb = parseColor(placeholderColor);
+        if (!textRgb) return;
+        
+        const backgroundRgb = getBackgroundColor(element);
+        const textLuminance = getLuminance(textRgb[0], textRgb[1], textRgb[2]);
+        const bgLuminance = getLuminance(backgroundRgb[0], backgroundRgb[1], backgroundRgb[2]);
+        const contrastRatio = getContrastRatio(textLuminance, bgLuminance);
+        
+        //(4.5:1 for normal text) - for placeholders
+        if (contrastRatio < 4.5) {
+          issues.push({
+            element: element.outerHTML,
+            selector,
+            impact: `Placeholder text contrast ratio is ${contrastRatio.toFixed(2)}:1, below WCAG AA minimum of 4.5:1`,
+            recommendation: `Improve placeholder text contrast by using darker placeholder text or ensure proper labeling as placeholders should not be the primary means of identifying form fields`,
+          });
+        }
+      });
+      
+      
+      const focusableElements = document.querySelectorAll(
+        'a[href], button, input, textarea, select, [tabindex]:not([tabindex="-1"])'
+      );
+      focusableElements.forEach((ele: Element, index: number) => {
+        const element = ele as HTMLElement;
+
+        const originalFocus = document.activeElement;
+        element.focus();
+        
+        const focusStyle = window.getComputedStyle(element);
+        const outlineColor = focusStyle.outlineColor;
+        const outlineWidth = focusStyle.outlineWidth;
+        const outlineStyle = focusStyle.outlineStyle;
+        
+        if (originalFocus instanceof HTMLElement) {
+          originalFocus.focus();
+        } else {
+          element.blur();
+        }
+        
+        const selector = `${element.tagName.toLowerCase()}:nth-child(${index + 1})`;
+        
+        const hasOutline = outlineStyle !== 'none' && outlineWidth !== '0px' && outlineColor !== 'transparent';
+        const boxShadow = focusStyle.boxShadow;
+        const hasFocusShadow = boxShadow && boxShadow !== 'none';
+        
+        if (!hasOutline && !hasFocusShadow) {
+          issues.push({
+            element: element.outerHTML,
+            selector,
+            impact: 'Focusable element lacks visible focus indicator',
+            recommendation: 'Add outline, box-shadow, or other visual focus indicator with sufficient contrast',
+          });
+        } else if (hasOutline && outlineColor) {
+        
+          const outlineRgb = parseColor(outlineColor);
+          if (outlineRgb) {
+            const backgroundRgb = getBackgroundColor(element);
+            const outlineLuminance = getLuminance(outlineRgb[0], outlineRgb[1], outlineRgb[2]);
+            const bgLuminance = getLuminance(backgroundRgb[0], backgroundRgb[1], backgroundRgb[2]);
+            const contrastRatio = getContrastRatio(outlineLuminance, bgLuminance);
+            
+            //at least 3:1 contrast ratio
+            if (contrastRatio < 3) {
+              issues.push({
+                element: element.outerHTML,
+                selector,
+                impact: `Focus indicator contrast ratio is ${contrastRatio.toFixed(2)}:1, below recommended 3:1 minimum`,
+                recommendation: 'Use a focus indicator color with better contrast against the background',
+              });
+            }
+          }
+        }
+      });
       return issues;
     });
   }
