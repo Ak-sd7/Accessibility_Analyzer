@@ -23,7 +23,7 @@ export abstract class BaseRuleStruct {
 
   abstract examine(page: Page): Promise<Issue[]>;
 
-  protected createIssue(
+  public createIssue(
     element: string,
     selector: string,
     impact: string,
@@ -47,7 +47,7 @@ export abstract class BaseRuleStruct {
 export interface Report {
   // dashboard
   url: string;
-  timestamp: Date;
+  time: Date;
   summary: {
     totalIssues: number;
     critical: number;
