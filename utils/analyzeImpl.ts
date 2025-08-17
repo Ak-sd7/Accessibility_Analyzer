@@ -43,7 +43,7 @@ export class AnalyzeImpl {
 			})
 		);
 
-			overallIssues = allResults.flat();
+		overallIssues = allResults.flat();
 		const summary = {
 			totalIssues: overallIssues.length,
 			critical: overallIssues.filter(i => i.severity === 'critical').length,
