@@ -15,12 +15,12 @@ export class FormAnalyseRule extends BaseRuleStruct {
 	  const formElements = document.querySelectorAll(
 		`input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="image"]),
 		textarea,
-		button[type="submit],
+		button[type="submit"],
 		[role="textbox"],
 		[role="spinbutton"],
 		[role="slider"],
 		[role="searchbox"],
-		[role="switch"],
+		[role="switch"]
 		`
 	  );
 	  if (formElements.length === 0) {
@@ -82,6 +82,81 @@ export class FormAnalyseRule extends BaseRuleStruct {
 		}
 
 		// input issues
+		const checkInputType = (
+			element: HTMLElement,
+			selector: string,
+			type: string,
+			issues: any[]
+		): void => {
+			switch (type) {
+			case "email":
+				if (
+				!element.getAttribute("autocomplete") &&
+				!element.getAttribute("spellcheck")
+				) {
+				issues.push({
+					element: element.outerHTML,
+					selector,
+					impact:
+					"Email input missing autocomplete and spellcheck attributes",
+					recommendation: 'Add autocomplete="email" and spellcheck="false"',
+				});
+				}
+				break;
+
+			case "password":
+				if (!element.getAttribute("autocomplete")) {
+				issues.push({
+					element: element.outerHTML,
+					selector,
+					impact: "Password input missing autocomplete attribute",
+					recommendation:
+					'Add appropriate autocomplete value (e.g., "current-password", "new-password")',
+				});
+				}
+				break;
+
+			case "tel":
+				if (!element.getAttribute("autocomplete")) {
+				issues.push({
+					element: element.outerHTML,
+					selector,
+					impact: "Phone input missing autocomplete attribute",
+					recommendation: 'Add autocomplete="tel"',
+				});
+				}
+				break;
+
+			case "url":
+				if (!element.getAttribute("spellcheck")) {
+				issues.push({
+					element: element.outerHTML,
+					selector,
+					impact: "URL input should disable spellcheck",
+					recommendation: 'Add spellcheck="false"',
+				});
+				}
+				break;
+
+			case "number":
+			case "range":
+				const min = element.getAttribute("min");
+				const max = element.getAttribute("max");
+				const step = element.getAttribute("step");
+
+				if ((min || max || step) && !element.getAttribute("aria-describedby")) {
+				issues.push({
+					element: element.outerHTML,
+					selector,
+					impact:
+					"Numeric constraints not communicated to assistive technologies",
+					recommendation:
+					"Use aria-describedby to reference text explaining min/max/step values",
+				});
+				}
+				break;
+			}
+		}
 		if (placeholder && placeholder.trim() && !hasLabel) {
 		  issues.push({
 			element: htmlElement.outerHTML,
@@ -126,7 +201,7 @@ export class FormAnalyseRule extends BaseRuleStruct {
 			});
 			}
 
-			this.checkInputType(element, selector, elementType, issues);
+			checkInputType(element, selector, elementType, issues);
 	  	});
 
 		const submitButtons = document.querySelectorAll(
@@ -153,79 +228,4 @@ export class FormAnalyseRule extends BaseRuleStruct {
 	});
   }
 
-  private checkInputType(
-	element: HTMLElement,
-	selector: string,
-	type: string,
-	issues: any[]
-  ): void {
-	switch (type) {
-	  case "email":
-		if (
-		  !element.getAttribute("autocomplete") &&
-		  !element.getAttribute("spellcheck")
-		) {
-		  issues.push({
-			element: element.outerHTML,
-			selector,
-			impact:
-			  "Email input missing autocomplete and spellcheck attributes",
-			recommendation: 'Add autocomplete="email" and spellcheck="false"',
-		  });
-		}
-		break;
-
-	  case "password":
-		if (!element.getAttribute("autocomplete")) {
-		  issues.push({
-			element: element.outerHTML,
-			selector,
-			impact: "Password input missing autocomplete attribute",
-			recommendation:
-			  'Add appropriate autocomplete value (e.g., "current-password", "new-password")',
-		  });
-		}
-		break;
-
-	  case "tel":
-		if (!element.getAttribute("autocomplete")) {
-		  issues.push({
-			element: element.outerHTML,
-			selector,
-			impact: "Phone input missing autocomplete attribute",
-			recommendation: 'Add autocomplete="tel"',
-		  });
-		}
-		break;
-
-	  case "url":
-		if (!element.getAttribute("spellcheck")) {
-		  issues.push({
-			element: element.outerHTML,
-			selector,
-			impact: "URL input should disable spellcheck",
-			recommendation: 'Add spellcheck="false"',
-		  });
-		}
-		break;
-
-	  case "number":
-	  case "range":
-		const min = element.getAttribute("min");
-		const max = element.getAttribute("max");
-		const step = element.getAttribute("step");
-
-		if ((min || max || step) && !element.getAttribute("aria-describedby")) {
-		  issues.push({
-			element: element.outerHTML,
-			selector,
-			impact:
-			  "Numeric constraints not communicated to assistive technologies",
-			recommendation:
-			  "Use aria-describedby to reference text explaining min/max/step values",
-		  });
-		}
-		break;
-	}
-  }
 }

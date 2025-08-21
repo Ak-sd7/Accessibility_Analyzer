@@ -1,5 +1,5 @@
 "use client"
-import {Button, Card, CardBody, Input} from "@heroui/react";
+import {Button, Card, CardBody, Input, PressEvent} from "@heroui/react";
 import { Search, Globe, Zap} from "lucide-react";
 import HomeFeatureDesc from "@/components/homeFeatureDesc";
 import { useState } from "react";
@@ -9,8 +9,8 @@ import axios from "axios";
 export default function Home() {
   const [url, setUrl] = useState<String>("");
 
-  const submitHandler = async(e:any)=>{  
-    e.preventDefault();
+  const submitHandler = async()=>{  
+    // e.preventDefault();
     try {
       const { data } = await axios.post(
         `api/scrape`,
@@ -22,6 +22,7 @@ export default function Home() {
           withCredentials: true,
         }
       );
+      toast.success("Report Extracted");
     } catch (err: unknown) {
       let errorMessage = 'An error occurred';
   
