@@ -2,8 +2,40 @@
 import {Button, Card, CardBody, Input} from "@heroui/react";
 import { Search, Globe, Zap} from "lucide-react";
 import HomeFeatureDesc from "@/components/homeFeatureDesc";
+import { useState } from "react";
+import { toast } from "react-hot-toast";
+import axios from "axios";
 
 export default function Home() {
+  const [url, setUrl] = useState<String>("");
+
+  const submitHandler = async(e:any)=>{  
+    e.preventDefault();
+    try {
+      const { data } = await axios.post(
+        `api/scrape`,
+        { url },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+    } catch (err: unknown) {
+      let errorMessage = 'An error occurred';
+  
+      if (err && typeof err === 'object' && 'response' in err) {
+        const response = (err as any).response;
+        errorMessage = response?.data?.message || errorMessage;
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      
+      toast.error(errorMessage);
+    }
+  }
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-center px-4">
       <div className="mb-8">
@@ -24,18 +56,20 @@ export default function Home() {
           <Input
             type="url"
             label="Website URL"
-            placeholder="https://yourwebsite.com"
+            placeholder="https://website.com"
             size="lg"
             variant="bordered"
             startContent={
               <Globe className="w-5 h-5 text-default-400 pointer-events-none flex-shrink-0" />
             }
+            onChange={(e)=>{setUrl(e.target.value)}}
           />
           <Button 
             color="primary" 
             size="lg" 
             className="w-full font-semibold"
             startContent={<Search className="w-5 h-5" />}
+            onPress = {submitHandler}
           >
             Analyze Website
           </Button>

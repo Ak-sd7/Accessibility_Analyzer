@@ -1,6 +1,6 @@
 import "@/styles/globals.css";
 import { Metadata, Viewport } from "next";;
-
+import { Toaster } from "react-hot-toast";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
@@ -21,6 +21,7 @@ export default function RootLayout({
             <main className="container mx-auto max-w-7xl px-6 flex-grow">
               {children}
             </main>
+            <Toaster/>
         </Providers>
       </body>
     </html>
