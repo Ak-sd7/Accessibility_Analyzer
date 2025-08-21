@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     const analyzer = new AnalyzeImpl();
     const report = await analyzer.analyze(page);
-    
+    // console.log(report);
     return new Response(JSON.stringify({ message: report }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
