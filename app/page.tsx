@@ -26,9 +26,8 @@ export default function Home() {
           withCredentials: true,
         }
       );
-      isLoading(false);
       toast.success("Report Extracted");
-      window.location.replace("/reportDashboard");
+      router.push("/reportDashboard");
     } catch (err: unknown) {
       let errorMessage = 'An error occurred';
 
@@ -90,7 +89,7 @@ export default function Home() {
                 playsInline
                 className="w-64 h-64 mb-4"
               />
-              <p className="text-black text-3xl">Analyzing your website...</p>
+              <p className="text-black text-xl">Analyzing your website...</p>
             </div>
           )}
         </CardBody>

@@ -2,7 +2,10 @@
 
 const page = () => {
   return (
-	<div>page</div>
+	<div>
+		db connection - data store and then when scrapped returns an id 
+		then the fecthing can happen on that
+	</div>
   )
 }
 
