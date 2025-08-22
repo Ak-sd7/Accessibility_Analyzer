@@ -4,11 +4,13 @@ import { Search, Globe, Zap } from "lucide-react";
 import HomeFeatureDesc from "@/components/homeFeatureDesc";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 
 export default function Home() {
   const [url, setUrl] = useState<String>("");
   const [loading, isLoading] = useState<boolean>(false);
+  const router = useRouter();
 
   const submitHandler = async () => {
     // e.preventDefault();
@@ -24,7 +26,9 @@ export default function Home() {
           withCredentials: true,
         }
       );
+      isLoading(false);
       toast.success("Report Extracted");
+      window.location.replace("/reportDashboard");
     } catch (err: unknown) {
       let errorMessage = 'An error occurred';
 
@@ -34,10 +38,8 @@ export default function Home() {
       } else if (err instanceof Error) {
         errorMessage = err.message;
       }
-
-      toast.error(errorMessage);
-    } finally {
       isLoading(false);
+      toast.error(errorMessage);
     }
   }
 
