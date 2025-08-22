@@ -1,6 +1,6 @@
 "use client"
-import {Button, Card, CardBody, Input, PressEvent} from "@heroui/react";
-import { Search, Globe, Zap} from "lucide-react";
+import { Button, Card, CardBody, Input, PressEvent } from "@heroui/react";
+import { Search, Globe, Zap } from "lucide-react";
 import HomeFeatureDesc from "@/components/homeFeatureDesc";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
@@ -8,9 +8,11 @@ import axios from "axios";
 
 export default function Home() {
   const [url, setUrl] = useState<String>("");
+  const [loading, isLoading] = useState<boolean>(false);
 
-  const submitHandler = async()=>{  
+  const submitHandler = async () => {
     // e.preventDefault();
+    isLoading(true);
     try {
       const { data } = await axios.post(
         `api/scrape`,
@@ -25,15 +27,17 @@ export default function Home() {
       toast.success("Report Extracted");
     } catch (err: unknown) {
       let errorMessage = 'An error occurred';
-  
+
       if (err && typeof err === 'object' && 'response' in err) {
         const response = (err as any).response;
         errorMessage = response?.data?.message || errorMessage;
       } else if (err instanceof Error) {
         errorMessage = err.message;
       }
-      
+
       toast.error(errorMessage);
+    } finally {
+      isLoading(false);
     }
   }
 
@@ -47,11 +51,11 @@ export default function Home() {
           <h1 className="text-4xl font-bold">Accessibility Analyzer</h1>
         </div>
         <p className="text-lg text-default-600 max-w-2xl">
-          Analyze your website for accessibility issues and get actionable insights 
+          Analyze your website for accessibility issues and get actionable insights
           to make your site more inclusive for everyone.
         </p>
       </div>
-      
+
       <Card className="max-w-md w-full shadow-lg">
         <CardBody className="gap-4">
           <Input
@@ -63,20 +67,33 @@ export default function Home() {
             startContent={
               <Globe className="w-5 h-5 text-default-400 pointer-events-none flex-shrink-0" />
             }
-            onChange={(e)=>{setUrl(e.target.value)}}
+            onChange={(e) => { setUrl(e.target.value) }}
           />
-          <Button 
-            color="primary" 
-            size="lg" 
+          <Button
+            color="primary"
+            size="lg"
             className="w-full font-semibold"
             startContent={<Search className="w-5 h-5" />}
-            onPress = {submitHandler}
+            onPress={submitHandler}
           >
             Analyze Website
           </Button>
+          {loading && (
+            <div className="fixed inset-0 bg-white bg-opacity-90 flex flex-col items-center justify-center z-50">
+              <video
+                src="/assets/search_engine.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-64 h-64 mb-4"
+              />
+              <p className="text-black text-3xl">Analyzing your website...</p>
+            </div>
+          )}
         </CardBody>
       </Card>
-      <HomeFeatureDesc/>
+      <HomeFeatureDesc />
     </div>
   );
 }
