@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import puppeteer from "puppeteer";
 import { AnalyzeImpl } from "@/utils/analyzeImpl";
+import { connectDB } from "@/config/mongodb";
 
 const isUrl = (url: string):boolean=>{
 	try {
@@ -14,6 +15,7 @@ const isUrl = (url: string):boolean=>{
 export async function POST(request: NextRequest) {
   let browser;
   try {
+    await connectDB();
     const { url } = await request.json();
     if (!url || !isUrl(url)) {
       return new Response(JSON.stringify({ error: "url is required" }), {
