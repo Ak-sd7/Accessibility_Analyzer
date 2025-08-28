@@ -30,10 +30,11 @@ export const authOptions: NextAuthOptions = {
 			return true;
 		},
 	},
-	pages: {
-		signIn: "/auth/signin",
-		error: "/auth/error",
-	},
+	// pages: {
+	// 	signIn: "/auth/signin",
+	// 	error: "/auth/error",
+	// },
 };
 
-export default NextAuth(authOptions);
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };

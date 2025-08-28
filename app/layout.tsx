@@ -6,7 +6,10 @@ import SessionProvider from "@/components/sessionProvider";
 
 export const metadata: Metadata = {
   title : "Accessibility_Analyzer",
-  description : "A comprehensive web accessibility analyzer featuring automated compliance checking, impact analysis, AI-powered improvement suggestions, and innovative screen reader simulation - providing complete solution for teams to audit, fix, and maintain accessible websites"
+  description : "A comprehensive web accessibility analyzer featuring automated compliance checking, impact analysis, AI-powered improvement suggestions, and innovative screen reader simulation - providing complete solution for teams to audit, fix, and maintain accessible websites",
+  icons: {
+    icon: "/assets/favicon.ico",
+  },
 };
 
 export default function RootLayout({
