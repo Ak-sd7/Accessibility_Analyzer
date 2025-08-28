@@ -2,6 +2,7 @@ import "@/styles/globals.css";
 import { Metadata, Viewport } from "next";;
 import { Toaster } from "react-hot-toast";
 import { Providers } from "./providers";
+import SessionProvider from "@/components/sessionProvider";
 
 export const metadata: Metadata = {
   title : "Accessibility_Analyzer",
@@ -19,7 +20,7 @@ export default function RootLayout({
       <body>
         <Providers>
             <main className="container mx-auto max-w-7xl px-6 flex-grow">
-              {children}
+              <SessionProvider>{children}</SessionProvider>
             </main>
             <Toaster/>
         </Providers>

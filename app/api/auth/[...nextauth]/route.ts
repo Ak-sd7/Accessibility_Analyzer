@@ -27,7 +27,7 @@ export const authOptions: NextAuthOptions = {
 		async signIn({ user, account, profile }) {
 			console.log("User signed in:", user.id);
 			
-			// You can add custom user data here if needed
+			// add custom user data here if needed
 			// await customUserSetup(user.id);
 			
 			return true;
