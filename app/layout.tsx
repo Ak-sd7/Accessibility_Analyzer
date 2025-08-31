@@ -3,6 +3,7 @@ import { Metadata, Viewport } from "next";;
 import { Toaster } from "react-hot-toast";
 import { Providers } from "./providers";
 import SessionProvider from "@/components/sessionProvider";
+import Nav from "@/components/nav";
 
 export const metadata: Metadata = {
   title : "Accessibility_Analyzer",
@@ -23,9 +24,10 @@ export default function RootLayout({
       <body>
         <Providers>
             <main className="container mx-auto max-w-7xl px-6 flex-grow">
+              <Nav/>
               <SessionProvider>{children}</SessionProvider>
             </main>
-            <Toaster/>
+            <Toaster position="top-right"/>
         </Providers>
       </body>
     </html>
