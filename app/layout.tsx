@@ -24,7 +24,7 @@ export default function RootLayout({
       <head />
       <body>
         <Providers>
-          <main className="container mx-auto max-w-7xl px-6 flex-grow">
+          <main>
             <SessionProvider>
               <Nav />
               {children}
