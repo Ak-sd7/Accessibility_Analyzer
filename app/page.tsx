@@ -6,15 +6,22 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { signIn, useSession } from "next-auth/react";
 
 export default function Home() {
   const [url, setUrl] = useState<String>("");
   const [loading, isLoading] = useState<boolean>(false);
   const router = useRouter();
+  const {status} = useSession();
 
   const submitHandler = async () => {
     // e.preventDefault();
     isLoading(true);
+    if(status==="unauthenticated") {
+      toast.error("Please log in to analyze websites");
+      signIn("google");
+      return;
+    }
     try {
       const { data } = await axios.post(
         `api/scrape`,
