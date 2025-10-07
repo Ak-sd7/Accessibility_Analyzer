@@ -1,10 +1,16 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 interface Issue {
-  rule: string;       // e.g. "color-contrast"
+  id: string;
+  severity: string; // critical | serious | moderate | minor
+  wcagLevel: string;
+  wcagCriterion: string;
+  rule: string; // e.g. "color-contrast"
   description: string;
-  element: string;    // the DOM element affected
-  severity: string;   // critical | serious | moderate | minor
+  element: string; // the DOM element affected
+  selector: string;
+  impact: string;
+  recommendation: string;
 }
 
 export interface ReportDoc extends Document {
@@ -23,10 +29,19 @@ export interface ReportDoc extends Document {
 }
 
 const issueSchema = new Schema<Issue>({
-  rule: { type: String, required: true },
+  id: { type: String, required: true },
+  severity: {
+    type: String,
+    enum: ["critical", "serious", "moderate", "minor"],
+  },
+  wcagLevel: String,
+  wcagCriterion: String,
+  rule: String,
   description: String,
   element: String,
-  severity: { type: String, enum: ["critical", "serious", "moderate", "minor"] }
+  selector: String,
+  impact: String,
+  recommendation: String,
 });
 
 const reportSchema = new Schema<ReportDoc>(
@@ -47,4 +62,5 @@ const reportSchema = new Schema<ReportDoc>(
   { timestamps: true }
 );
 
-export default mongoose.models.Report || mongoose.model<ReportDoc>("Report", reportSchema);
+export default mongoose.models.Report ||
+  mongoose.model<ReportDoc>("Report", reportSchema);
