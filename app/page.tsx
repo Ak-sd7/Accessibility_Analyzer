@@ -1,5 +1,5 @@
 "use client"
-import { Button, Card, CardBody, Input, PressEvent } from "@heroui/react";
+import { Button, Card, CardBody, Input } from "@heroui/react";
 import { Search, Globe, Zap } from "lucide-react";
 import HomeFeatureDesc from "@/components/homeFeatureDesc";
 import { useState } from "react";
